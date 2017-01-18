@@ -24,4 +24,28 @@ features_train,features_test,targets_train,targets_test = train_test_split(featu
 reg = LinearRegression()
 reg.fit(features_train,targets_train)
 pred = reg.predict(features_test)
-print "Mean squared error :",mean_squared_error(targets_test,pred)
+print "Root mean squared error :",np.sqrt(mean_squared_error(targets_test,pred))
+
+#train the model without displacement feature
+features = features.drop('displacement',axis=1)
+
+#train_test_split data
+features_train,features_test,targets_train,targets_test = train_test_split(features,targets,test_size=0.25,random_state=42)
+
+#training classifier
+reg = LinearRegression()
+reg.fit(features_train,targets_train)
+pred = reg.predict(features_test)
+print "Root mean squared error :",np.sqrt(mean_squared_error(targets_test,pred))
+
+#train the model without acceleration feature
+features = data[['displacement','horsepower','weight']];features
+
+#train_test_split data
+features_train,features_test,targets_train,targets_test = train_test_split(features,targets,test_size=0.25,random_state=42)
+
+#training classifier
+reg = LinearRegression()
+reg.fit(features_train,targets_train)
+pred = reg.predict(features_test)
+print "Root mean squared error :",np.sqrt(mean_squared_error(targets_test,pred))
