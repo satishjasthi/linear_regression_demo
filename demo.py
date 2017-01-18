@@ -1,11 +1,10 @@
 import pandas as pd;import numpy as np
 import matplotlib.pyplot as plt;import seaborn as sns
-from sklearn import linear_model
-from sklearn.feature_selection import RFE
+from sklearn import linear_model,cross_validation
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.model_selection import cross_val_predict
-from sklearn.cross_validation import cross_val_score,train_test_split
+from sklearn.cross_validation import cross_val_score
 from IPython import get_ipython
 get_ipython().run_line_magic('matplotlib', 'inline')
 
@@ -16,21 +15,16 @@ poly = PolynomialFeatures(2)
 features = poly.fit_transform(dataframe)
 features = pd.DataFrame(features,columns =['constant','Brain','Body','Brain**2','Brain*Body','Body**2'])
 target = features['Body']
-features
-sns.pairplot(features,x_vars = ['Brain','Brain**2','Brain*Body','Body**2'],y_vars = 'Body',kind = 'reg')
-features = features.drop('Body',axis= 1)
-
-#splitting data into training and testing data
-features_train,features_test,target_train,target_test = train_test_split(features,target,test_size=0.25,random_state = 0)
+features = features.drop('Body',axis= 1);
 
 #training classifier
 lr = LinearRegression()
-lr.fit(features_train,target_train)
-print "intercept of LR line:",lr.intercept_
-print "co-efficients of LR line:", lr.coef_
-pred = lr.predict(features_test)
-
-
 predicted = cross_val_predict(lr,features,target,cv = 5)
-scores = cross_val_score(lr,features,target,cv=5,scoring = 'r2')
-scores
+scores = cross_val_score(lr,features,target,cv=5,scoring = 'r2') # r2 values over different folds
+
+#using k-fold cross_validation to split train and test classifier
+loo = cross_validation.LeaveOneOut(len(target))
+regr = LinearRegression()
+scores = cross_validation.cross_val_score(regr, features, target, scoring='mean_squared_error', cv=loo,)
+print "Mean squared error :",scores.mean()*(-1) # average Mean squared error : 3.07213345844
+print "Root Mean squared error :",np.sqrt(scores.mean()*(-1)) #Root Mean squared error : 1.75275025558
